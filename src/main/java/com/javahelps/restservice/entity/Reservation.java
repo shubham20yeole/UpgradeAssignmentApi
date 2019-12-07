@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 @Entity
 public class Reservation implements Serializable {
@@ -28,8 +29,7 @@ public class Reservation implements Serializable {
 	@Column(name = "RESERVATION_ID", unique = true, length = 255)
 	private String reservationId;
 	
-	@Basic
-	@Column(name = "RESERVATION_DATE")
+	@Column(name = "RESERVATION_DATE", unique = true)
     private Date reservationDate;
 
 	public String getReservationId() {

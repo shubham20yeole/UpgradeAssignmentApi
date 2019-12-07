@@ -1,6 +1,7 @@
 package com.javahelps.restservice.controller;
 
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,9 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.javahelps.errorhandling.UserServiceException;
 import com.javahelps.restservice.entity.Reservation;
 import com.javahelps.restservice.entity.User;
 import com.javahelps.restservice.repository.UserRepository;
+import com.javahelps.service.DateImplementation;
+
 import org.hibernate.Session;
 import javassist.tools.web.BadHttpRequest;
 @RestController
@@ -28,38 +32,22 @@ public class UserController {
 	private UserRepository repository;
 
 	@GetMapping
-	public Iterable<User> findAll() {
-		
-		Reservation res1 = new Reservation();
-		res1.setReservationDate(new Date());
- 
-		Reservation res2 = new Reservation();
-		res2.setReservationDate(new Date());
- 
-        //Add new Employee object
-        User firstUser = new User();
-        firstUser.setEmail("demo-user-first@mail.com");
-        firstUser.setFullname("demo-one");
- 
- 
-        Set<Reservation> reservations = new HashSet<Reservation>();
-        reservations.add(res1);
-        reservations.add(res2);
-        
-        firstUser.setReservations(reservations);
- 
-        repository.save(firstUser);
+	public Iterable<User> findAll() throws ParseException {
 		return repository.findAll();
 	}
 
-	@GetMapping(path = "/{username}")
-	public User find(@PathVariable("username") String username) {
-		return repository.findOne(username);
+	@GetMapping(path = "/{userid}")
+	public User find(@PathVariable("userid") String userId) {
+		return repository.findOne(userId);
 	}
 
 	@PostMapping(consumes = "application/json")
-	public User create(@RequestBody User user) {
-		return repository.save(user);
+	public User create(@RequestBody User user) throws UserServiceException {
+		try {
+			return repository.save(user);
+		} catch (Exception sqle) {
+		    throw new UserServiceException(sqle);
+		}
 	}
 
 	@DeleteMapping(path = "/{username}")

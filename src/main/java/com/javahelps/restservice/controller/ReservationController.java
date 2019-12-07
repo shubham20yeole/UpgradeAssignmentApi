@@ -1,11 +1,19 @@
 package com.javahelps.restservice.controller;
 
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,11 +23,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.Gson;
 import com.javahelps.restservice.entity.Reservation;
 import com.javahelps.restservice.entity.User;
 import com.javahelps.restservice.repository.ReservationRepository;
 import com.javahelps.restservice.repository.UserRepository;
+import com.javahelps.service.DateImplementation;
+
 import org.hibernate.Session;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import javassist.tools.web.BadHttpRequest;
 @RestController
 @RequestMapping(path = "/reservations")
@@ -27,35 +43,18 @@ public class ReservationController {
 
 	@Autowired
 	private ReservationRepository repository;
+	private DateImplementation dateUtils;
 
 	@GetMapping
-	public Iterable<Reservation> findAll() {
-		return repository.findAll();
+	public JSONArray findAll() throws ParseException, java.text.ParseException {
+		dateUtils = new DateImplementation();
+		return (JSONArray) new JSONParser().parse(new Gson().toJson(repository.findCampsiteVacancy()));
 	}
 
-//	@GetMapping(path = "/{username}")
-//	public User find(@PathVariable("username") String username) {
-//		return repository.findOne(username);
-//	}
-//
-//	@PostMapping(consumes = "application/json")
-//	public User create(@RequestBody User user) {
-//		return repository.save(user);
-//	}
-//
-//	@DeleteMapping(path = "/{username}")
-//	public void delete(@PathVariable("username") String username) {
-//		repository.delete(username);
-//	}
-//
-//	@PutMapping(path = "/{fullname}")
-//	public User update(@PathVariable("fullname") String fullname, @RequestBody User user) throws BadHttpRequest {
-//		if (repository.exists(fullname)) {
-//			user.setFullname(fullname);
-//			return repository.save(user);
-//		} else {
-//			throw new BadHttpRequest();
-//		}
-//	}
-
+	@RequestMapping(value = "/vacancy")
+	public JSONArray findVacancy() throws java.text.ParseException {
+		dateUtils = new DateImplementation();
+		Set<Object> reservations = repository.findCampsiteVacancy();
+		return dateUtils.getVacancies(reservations);	
+	}
 }

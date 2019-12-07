@@ -10,6 +10,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import com.javahelps.restservice.entity.User;
 import com.javahelps.restservice.repository.UserRepository;
 
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@EnableSwagger2
 @SpringBootApplication(exclude={SecurityAutoConfiguration.class})
 @EnableJpaRepositories
 public class Application {
@@ -17,16 +20,4 @@ public class Application {
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
-
-//	@Bean
-//	protected CommandLineRunner init(final UserRepository userRepository) {
-//
-//		return args -> {
-//			User user = new User();
-//			user.setFullname("Administrator");
-//			user.setEmail("admin@javahelps.com");
-//			userRepository.save(user);
-//
-//		};
-//	}
 }
