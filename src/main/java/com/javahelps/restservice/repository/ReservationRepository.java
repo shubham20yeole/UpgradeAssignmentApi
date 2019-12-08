@@ -40,11 +40,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, String
 	public static final ReservationRepository ReservationDao = null;
 
 	public static final String FIND_RESERVED_DATES = "SELECT RESERVATION_DATE FROM reservation";
+	public static final String FIND_VACANT_DATES = "SELECT r FROM Reservation r WHERE r.reservationDate >= ?1 and r.reservationDate <= ?2";
 
 	@Query(value = FIND_RESERVED_DATES, nativeQuery = true)
 	public Set<Object> findCampsiteVacancy();
 	
-	@Query("SELECT r FROM Reservation r WHERE r.reservationDate >= ?1 and r.reservationDate <= ?2")
+	@Query(value = FIND_VACANT_DATES)
 	public List<Reservation> isVcancyAvailable(Date startDate, Date endDate);
 	
 }

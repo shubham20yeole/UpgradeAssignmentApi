@@ -43,18 +43,6 @@ public class DateImplementation extends DateIml{
 	}
 	
 	
-	public List<String> invalidDates(Set<Object> reservations, Set<Reservation> newReservations) throws ParseException {
-		Set<String> reservationDates = preProcessReservationSet(reservations);
-		List<String> invalidDates = new LinkedList<>();
-		for (Reservation newRes: newReservations) {
-			String newDate = dateToString(newRes.getReservationDate());
-			if (reservationDates.contains(newDate)) {
-				invalidDates.add(newDate);
-			}
-		}
-		return invalidDates;
-	}
-
 	public JSONArray getVacancies(Set<Object> reservations) throws ParseException {
 		JSONArray vacancies = new JSONArray();
 		Date today = new Date();
@@ -80,6 +68,5 @@ public class DateImplementation extends DateIml{
 		Collections.sort(list);
 		return new DateRange(list.get(0).getReservationDate(), list.get(list.size()-1).getReservationDate());
 	}
-
 }
 

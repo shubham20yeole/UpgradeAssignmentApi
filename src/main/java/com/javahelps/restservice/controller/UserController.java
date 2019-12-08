@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.javahelps.errorhandling.ErrorCode;
+import com.javahelps.errorhandling.Errors;
 import com.javahelps.errorhandling.UserServiceException;
 import com.javahelps.restservice.entity.Reservation;
 import com.javahelps.restservice.entity.User;
@@ -57,24 +57,24 @@ public class UserController {
 	public User create(@RequestBody User user) throws UserServiceException, ParseException {
 
 		Set<Reservation> reservations = user.getReservations();
-		if (reservations.size() == 0) throw new UserServiceException(ErrorCode.DATES_NOT_FOUND, ErrorCode.DATES_NOT_FOUND_STATUS);
+		if (reservations.size() == 0) throw new UserServiceException(Errors.DATES_NOT_FOUND, Errors.DATES_NOT_FOUND_STATUS);
 
 		DateRange range = dateUtils.getResDateRange(reservations);
 
 		if (range.isSingleDayReservation()) {
 			List<Reservation> reserved = reservationRepository.isVcancyAvailable(range.getStartDate(), dateUtils.addDays(1, range.getStartDate()).getTime());
-			if(reserved != null) throw new UserServiceException(ErrorCode.DATES_UNAVAILABLE, ErrorCode.DATES_UNAVAILABLE_STATUS);
+			if(reserved != null) throw new UserServiceException(Errors.DATES_UNAVAILABLE, Errors.DATES_UNAVAILABLE_STATUS);
 		} 
 
 		if(!range.hasValidStartDate()) {
-			throw new UserServiceException(ErrorCode.DATES_INVALID, ErrorCode.DATES_INVALID_STATUS);
+			throw new UserServiceException(Errors.DATES_INVALID, Errors.DATES_INVALID_STATUS);
 		}
 
 		List<Reservation> conflicts = reservationRepository.isVcancyAvailable(range.getStartDate(), range.getEndDate());
-		if (conflicts.size() > 0) throw new UserServiceException(ErrorCode.DATES_UNAVAILABLE, ErrorCode.DATES_UNAVAILABLE_STATUS);
+		if (conflicts.size() > 0) throw new UserServiceException(Errors.DATES_UNAVAILABLE, Errors.DATES_UNAVAILABLE_STATUS);
 
 		if(!range.isThreeDaysReservation()) {
-			throw new UserServiceException(ErrorCode.DATES_MAX_DURATION_EXCEED, ErrorCode.DATES_MAX_DURATION_EXCEED_STATUS);
+			throw new UserServiceException(Errors.DATES_MAX_DURATION_EXCEED, Errors.DATES_MAX_DURATION_EXCEED_STATUS);
 		}
 
 		return userRepository.save(user);
