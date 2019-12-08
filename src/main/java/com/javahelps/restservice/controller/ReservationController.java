@@ -51,7 +51,7 @@ public class ReservationController {
 		return (JSONArray) new JSONParser().parse(new Gson().toJson(repository.findCampsiteVacancy()));
 	}
 
-	@RequestMapping(value = "/vacancy")
+	@GetMapping(value = "/vacancy")
 	public JSONArray findVacancy() throws java.text.ParseException {
 		dateUtils = new DateImplementation();
 		Set<Object> reservations = repository.findCampsiteVacancy();

@@ -1,7 +1,11 @@
 package com.javahelps.restservice.repository;
 import java.util.*;
-import java.util.HashSet;
-import java.util.Set;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
@@ -34,9 +38,13 @@ import com.javahelps.restservice.entity.User;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, String> {
 	public static final ReservationRepository ReservationDao = null;
-	
-	public static final String FIND_VACANCIES = "SELECT RESERVATION_DATE FROM reservation";
 
-	@Query(value = FIND_VACANCIES, nativeQuery = true)
+	public static final String FIND_RESERVED_DATES = "SELECT RESERVATION_DATE FROM reservation";
+
+	@Query(value = FIND_RESERVED_DATES, nativeQuery = true)
 	public Set<Object> findCampsiteVacancy();
+	
+	@Query("SELECT r FROM Reservation r WHERE r.reservationDate >= ?1 and r.reservationDate <= ?2")
+	public List<Reservation> isVcancyAvailable(Date startDate, Date endDate);
+	
 }
