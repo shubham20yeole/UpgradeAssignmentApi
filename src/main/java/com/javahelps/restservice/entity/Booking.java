@@ -15,15 +15,14 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
 
-
 @Entity
-public class Booking implements Serializable{
+public class Booking implements Serializable {
 	private static final long serialVersionUID = -6790693372846798580L;
-	
+
 	public Booking() {
 		this.setBookingId(UUID.randomUUID().toString());
 	}
-	
+
 	@Id
 	@GenericGenerator(name = "uuid", strategy = "uuid")
 	@Column(name = "BOOKING_ID", unique = true, length = 255)
@@ -35,8 +34,8 @@ public class Booking implements Serializable{
 	@Column(name = "EMAIL", updatable = false, nullable = false)
 	private String email;
 
-	@OneToMany(cascade=CascadeType.ALL)
-	@JoinColumn(name="USER_ID")
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "USER_ID")
 	private Set<BookingDate> bookingDates;
 
 	public String getBookingId() {
@@ -46,11 +45,11 @@ public class Booking implements Serializable{
 	public void setBookingId(String userId) {
 		this.bookingId = userId;
 	}
-	
+
 	public String getFullname() {
 		return fullname;
 	}
-	
+
 	public void setFullname(String fullname) {
 		this.fullname = fullname;
 	}
@@ -67,8 +66,9 @@ public class Booking implements Serializable{
 		return this.bookingDates;
 	}
 
-	public void setBookingDates(Set<BookingDate> bookingDates) {
+	public void setBookingDates(
+			Set<BookingDate> bookingDates) {
 		this.bookingDates = bookingDates;
 	}
-	
+
 }

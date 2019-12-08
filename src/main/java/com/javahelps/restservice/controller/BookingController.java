@@ -1,6 +1,5 @@
 package com.javahelps.restservice.controller;
 
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,19 +19,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.javahelps.errorhandling.Errors;
+import com.javahelps.errorhandling.Constants;
 import com.javahelps.errorhandling.UserServiceException;
 import com.javahelps.restservice.entity.BookingDate;
 import com.javahelps.restservice.entity.Booking;
 import com.javahelps.restservice.repository.BookingDateRepository;
 import com.javahelps.restservice.repository.BookingRepository;
-import com.javahelps.service.DateImplementation;
+import com.javahelps.service.DateUtilImpl;
 import com.javahelps.service.DateRange;
 
 import org.hibernate.Session;
 import javassist.tools.web.BadHttpRequest;
+
 @RestController
-@RequestMapping(path = "/users")
+@RequestMapping(path = "/booking")
 public class BookingController {
 
 	@Autowired
@@ -41,7 +41,7 @@ public class BookingController {
 	@Autowired
 	private BookingDateRepository bookingDatesRepository;
 
-	DateImplementation dateUtils = new DateImplementation();
+	DateUtilImpl dateUtils = new DateUtilImpl();
 
 	@GetMapping
 	public Iterable<Booking> findAll() throws ParseException {
@@ -54,27 +54,38 @@ public class BookingController {
 	}
 
 	@PostMapping(consumes = "application/json")
-	public Booking create(@RequestBody Booking booking) throws UserServiceException, ParseException {
+	public Booking create(@RequestBody Booking booking)
+			throws UserServiceException, ParseException {
 
 		Set<BookingDate> bookingDates = booking.getBookingDates();
-		if (bookingDates.size() == 0) throw new UserServiceException(Errors.DATES_NOT_FOUND, Errors.DATES_NOT_FOUND_STATUS);
+		if (bookingDates.size() == 0)
+			throw new UserServiceException(Constants.DATES_NOT_FOUND,
+					Constants.DATES_NOT_FOUND_STATUS);
 
-		DateRange range = dateUtils.getResDateRange(bookingDates);
+		DateRange range = dateUtils.getDateRange(bookingDates);
 
 		if (range.isSingleDayReservation()) {
-			List<BookingDate> reserved = bookingDatesRepository.isVcancyAvailable(range.getStartDate(), dateUtils.addDays(1, range.getStartDate()).getTime());
-			if(reserved != null) throw new UserServiceException(Errors.DATES_UNAVAILABLE, Errors.DATES_UNAVAILABLE_STATUS);
-		} 
-
-		if(!range.hasValidStartDate()) {
-			throw new UserServiceException(Errors.DATES_INVALID, Errors.DATES_INVALID_STATUS);
+			List<BookingDate> reserved = bookingDatesRepository
+					.getBookings(range.getStartDate(), dateUtils.addDays(1, range.getStartDate()));
+			if (reserved != null)
+				throw new UserServiceException(Constants.DATES_UNAVAILABLE,
+						Constants.DATES_UNAVAILABLE_STATUS);
 		}
 
-		List<BookingDate> conflicts = bookingDatesRepository.isVcancyAvailable(range.getStartDate(), range.getEndDate());
-		if (conflicts.size() > 0) throw new UserServiceException(Errors.DATES_UNAVAILABLE, Errors.DATES_UNAVAILABLE_STATUS);
+		if (!range.hasValidStartDate()) {
+			throw new UserServiceException(Constants.DATES_INVALID,
+					Constants.DATES_INVALID_STATUS);
+		}
 
-		if(!range.isThreeDaysReservation()) {
-			throw new UserServiceException(Errors.DATES_MAX_DURATION_EXCEED, Errors.DATES_MAX_DURATION_EXCEED_STATUS);
+		List<BookingDate> conflicts = bookingDatesRepository
+				.getBookings(range.getStartDate(), range.getEndDate());
+		if (conflicts.size() > 0)
+			throw new UserServiceException(Constants.DATES_UNAVAILABLE,
+					Constants.DATES_UNAVAILABLE_STATUS);
+
+		if (!range.isThreeDaysReservation()) {
+			throw new UserServiceException(Constants.DATES_MAX_DURATION_EXCEED,
+					Constants.DATES_MAX_DURATION_EXCEED_STATUS);
 		}
 
 		return bookingRepository.save(booking);
@@ -86,7 +97,8 @@ public class BookingController {
 	}
 
 	@PutMapping(path = "/{fullname}")
-	public Booking update(@PathVariable("fullname") String fullname, @RequestBody Booking user) throws BadHttpRequest {
+	public Booking update(@PathVariable("fullname") String fullname,
+			@RequestBody Booking user) throws BadHttpRequest {
 		if (bookingRepository.exists(fullname)) {
 			user.setFullname(fullname);
 			return bookingRepository.save(user);

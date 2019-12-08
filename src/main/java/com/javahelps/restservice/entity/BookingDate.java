@@ -16,52 +16,52 @@ import javax.persistence.ManyToOne;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
-import com.javahelps.service.DateImplementation;
+import com.javahelps.service.DateUtilImpl;
 
 @Entity
-public class BookingDate implements Comparable<BookingDate> {
-	
+public class BookingDate
+		implements Comparable<BookingDate> {
+
 	public BookingDate() {
 		this.setBookingDateId(UUID.randomUUID().toString());
 	}
-	
+
 	@Id
 	@GenericGenerator(name = "uuid", strategy = "uuid")
 	@Column(name = "BOOKING_DATE_ID", unique = true, length = 255)
 	private String bookingDateId;
-	
+
 	@Column(name = "BOOKING_DATE", unique = true, nullable = false)
-    private Date bookingDate;
+	private Date bookingDate;
 
 	public String getBookingDateId() {
-		return bookingDateId;
+		return this.bookingDateId;
 	}
-
 
 	private void setBookingDateId(String bookingDateId) {
 		this.bookingDateId = bookingDateId;
 	}
 
-
 	public Date getBookingDate() {
-		return bookingDate;
+		return this.bookingDate;
 	}
 
 	public void setBookingDate(Date bookingDate) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(bookingDate);
-	    c.set(Calendar.HOUR_OF_DAY, 12);
-	    c.set(Calendar.MINUTE, 0);
-	    c.set(Calendar.SECOND, 0);
+		c.set(Calendar.HOUR_OF_DAY, 12);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 0);
 		this.bookingDate = c.getTime();
 	}
 
 	@Override
-	  public int compareTo(BookingDate booking) {
-	    return this.getBookingDate().compareTo(booking.getBookingDate());
-	  }
-	
+	public int compareTo(BookingDate booking) {
+		return this.getBookingDate()
+				.compareTo(booking.getBookingDate());
+	}
+
 	@ManyToOne
-    private Booking user;
+	private Booking user;
 
 }

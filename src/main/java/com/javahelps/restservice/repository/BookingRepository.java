@@ -9,6 +9,7 @@ import com.javahelps.restservice.entity.Booking;
 
 @RestResource(exported = false)
 @Repository
-public interface BookingRepository extends JpaRepository<Booking, String> {
+public interface BookingRepository
+		extends JpaRepository<Booking, String> {
 	public static final BookingRepository UserDao = null;
 }

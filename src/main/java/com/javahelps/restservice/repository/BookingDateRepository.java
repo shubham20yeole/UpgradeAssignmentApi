@@ -1,4 +1,5 @@
 package com.javahelps.restservice.repository;
+
 import java.util.*;
 
 import org.springframework.data.jpa.repository.Query;
@@ -18,9 +19,9 @@ public interface BookingDateRepository extends JpaRepository<BookingDate, String
 	public static final String FIND_VACANT_DATES = "SELECT r FROM BookingDate r WHERE r.bookingDate >= ?1 and r.bookingDate <= ?2";
 
 	@Query(value = FIND_BOOKED_DATES, nativeQuery = true)
-	public Set<Object> findCampsiteVacancy();
-	
+	public Set<BookingDate> findCampsiteVacancy();
+
 	@Query(value = FIND_VACANT_DATES)
-	public List<BookingDate> isVcancyAvailable(Date startDate, Date endDate);
-	
+	public List<BookingDate> getBookings(Date startDate, Date endDate);
+
 }

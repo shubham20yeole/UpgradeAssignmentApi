@@ -5,11 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @EnableSwagger2
-@SpringBootApplication(exclude={SecurityAutoConfiguration.class})
+@SpringBootApplication(exclude = {
+		SecurityAutoConfiguration.class })
 @EnableJpaRepositories
 public class Application {
 
