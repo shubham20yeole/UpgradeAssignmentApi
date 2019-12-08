@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.json.simple.JSONArray;
 
-import com.javahelps.restservice.entity.Reservation;
+import com.javahelps.restservice.entity.BookingDate;
 
 public class DateImplementation extends DateIml{
 
@@ -63,10 +63,10 @@ public class DateImplementation extends DateIml{
 		return reservationsTemop;
 	}
 	
-	public DateRange getResDateRange(Set<Reservation> reservations) {
-		List<Reservation> list = new ArrayList<Reservation>(reservations);
+	public DateRange getResDateRange(Set<BookingDate> reservations) {
+		List<BookingDate> list = new ArrayList<BookingDate>(reservations);
 		Collections.sort(list);
-		return new DateRange(list.get(0).getReservationDate(), list.get(list.size()-1).getReservationDate());
+		return new DateRange(list.get(0).getBookingDate(), list.get(list.size()-1).getBookingDate());
 	}
 }
 

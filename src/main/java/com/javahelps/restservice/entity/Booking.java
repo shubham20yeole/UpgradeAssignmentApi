@@ -17,17 +17,17 @@ import org.hibernate.annotations.GenericGenerator;
 
 
 @Entity
-public class User implements Serializable{
+public class Booking implements Serializable{
 	private static final long serialVersionUID = -6790693372846798580L;
 	
-	public User() {
-		this.setUserId(UUID.randomUUID().toString());
+	public Booking() {
+		this.setBookingId(UUID.randomUUID().toString());
 	}
 	
 	@Id
 	@GenericGenerator(name = "uuid", strategy = "uuid")
-	@Column(name = "USER_ID", unique = true, length = 255)
-	private String userId;
+	@Column(name = "BOOKING_ID", unique = true, length = 255)
+	private String bookingId;
 
 	@Column(name = "FULL_NAME", updatable = false, nullable = false)
 	private String fullname;
@@ -37,14 +37,14 @@ public class User implements Serializable{
 
 	@OneToMany(cascade=CascadeType.ALL)
 	@JoinColumn(name="USER_ID")
-	private Set<Reservation> reservations;
+	private Set<BookingDate> bookingDates;
 
-	public String getUserId() {
-		return userId;
+	public String getBookingId() {
+		return bookingId;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setBookingId(String userId) {
+		this.bookingId = userId;
 	}
 	
 	public String getFullname() {
@@ -63,11 +63,12 @@ public class User implements Serializable{
 		this.email = email;
 	}
 
-	public Set<Reservation> getReservations() {
-		return reservations;
+	public Set<BookingDate> getBookingDates() {
+		return this.bookingDates;
 	}
 
-	public void setReservations(Set<Reservation> reservations) {
-		this.reservations = reservations;
+	public void setBookingDates(Set<BookingDate> bookingDates) {
+		this.bookingDates = bookingDates;
 	}
+	
 }
