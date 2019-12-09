@@ -45,14 +45,14 @@ public class BookingDateController {
 	public JSONArray checkAvaibility(@RequestParam(value = "from") Optional<String> from,
 			@RequestParam(value = "to") Optional<String> to) throws java.text.ParseException {
 
-		String startDateStringFormat = from.orElse(dateUtils.formatDate(new Date()));
+		String startDateStringFormat = from.orElse(dateUtils.formatDate(dateUtils.addDays(1, new Date())));
 		String endDateStringFormat   = to
 				.orElse(dateUtils.formatDate(dateUtils.addDays(31, new Date())));
 
 		Date startDate = bookingServiceImpl.formatDate(startDateStringFormat);
 		Date endDate   = dateUtils.formatDate(endDateStringFormat);
 
-		List<BookingDate> bookedDates = bookingDateRepository.getBookings(startDate,
+		List<BookingDate> bookedDates = bookingDateRepository.getBooking(startDate,
 				endDate);
 
 		return bookingServiceImpl.getAvailableDates(new HashSet<BookingDate>(bookedDates), startDate,

@@ -56,8 +56,10 @@ public class BookingController {
 	@PostMapping(consumes = "application/json")
 	public Booking create(@RequestBody Booking booking)
 			throws UserServiceException, ParseException {
-
+		
 		Set<BookingDate> bookingDates = booking.getBookingDates();
+		List<BookingDate> shs = new ArrayList<BookingDate>(bookingDates);
+		
 		if (bookingDates.size() == 0)
 			throw new UserServiceException(Constants.DATES_NOT_FOUND,
 					Constants.DATES_NOT_FOUND_STATUS);
@@ -65,8 +67,8 @@ public class BookingController {
 		DateRange range = dateUtils.getDateRange(bookingDates);
 
 		if (range.isSingleDayReservation()) {
-			List<BookingDate> reserved = bookingDatesRepository
-					.getBookings(range.getStartDate(), dateUtils.addDays(1, range.getStartDate()));
+			BookingDate reserved = bookingDatesRepository
+					.getBooking(range.getStartDate());
 			if (reserved != null)
 				throw new UserServiceException(Constants.DATES_UNAVAILABLE,
 						Constants.DATES_UNAVAILABLE_STATUS);
@@ -78,7 +80,7 @@ public class BookingController {
 		}
 
 		List<BookingDate> conflicts = bookingDatesRepository
-				.getBookings(range.getStartDate(), range.getEndDate());
+				.getBooking(range.getStartDate(), range.getEndDate());
 		if (conflicts.size() > 0)
 			throw new UserServiceException(Constants.DATES_UNAVAILABLE,
 					Constants.DATES_UNAVAILABLE_STATUS);

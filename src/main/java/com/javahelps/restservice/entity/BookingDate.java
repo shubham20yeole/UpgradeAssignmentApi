@@ -3,6 +3,7 @@ package com.javahelps.restservice.entity;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import javax.persistence.Basic;
@@ -49,9 +50,11 @@ public class BookingDate
 	public void setBookingDate(Date bookingDate) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(bookingDate);
-		c.set(Calendar.HOUR_OF_DAY, 12);
+		c.set(Calendar.HOUR_OF_DAY, 0);
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
+		c.add(Calendar.DAY_OF_MONTH, 1);
+		c.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
 		this.bookingDate = c.getTime();
 	}
 

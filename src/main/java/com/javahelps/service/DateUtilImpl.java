@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.json.simple.JSONArray;
 
@@ -27,9 +28,10 @@ public class DateUtilImpl implements DateUtil {
 	public Calendar dateToCalendar(Date date) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
-		c.set(Calendar.HOUR_OF_DAY, 12);
+		c.set(Calendar.HOUR_OF_DAY, 0);
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
+		c.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
 		return c;
 	}
 
