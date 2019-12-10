@@ -26,6 +26,7 @@ import com.javahelps.restservice.entity.Booking;
 import com.javahelps.restservice.repository.BookingDateRepository;
 import com.javahelps.restservice.repository.BookingRepository;
 import com.javahelps.service.DateUtilImpl;
+import com.javahelps.service.BookingDatesServiceImpl;
 import com.javahelps.service.DateRange;
 
 import org.hibernate.Session;
@@ -41,7 +42,8 @@ public class BookingController {
 	@Autowired
 	private BookingDateRepository bookingDatesRepository;
 
-	DateUtilImpl dateUtils = new DateUtilImpl();
+	DateUtilImpl            dateUtils               = new DateUtilImpl();
+	BookingDatesServiceImpl bookingDatesServiceImpl = new BookingDatesServiceImpl();
 
 	@GetMapping
 	public Iterable<Booking> findAll() throws ParseException {
@@ -56,10 +58,10 @@ public class BookingController {
 	@PostMapping(consumes = "application/json")
 	public Booking create(@RequestBody Booking booking)
 			throws UserServiceException, ParseException {
-		
-		Set<BookingDate> bookingDates = booking.getBookingDates();
-		List<BookingDate> shs = new ArrayList<BookingDate>(bookingDates);
-		
+
+		Set<BookingDate>  bookingDates = booking.getBookingDates();
+		List<BookingDate> shs          = new ArrayList<BookingDate>(bookingDates);
+
 		if (bookingDates.size() == 0)
 			throw new UserServiceException(Constants.DATES_NOT_FOUND,
 					Constants.DATES_NOT_FOUND_STATUS);
@@ -67,8 +69,7 @@ public class BookingController {
 		DateRange range = dateUtils.getDateRange(bookingDates);
 
 		if (range.isSingleDayReservation()) {
-			BookingDate reserved = bookingDatesRepository
-					.getBooking(range.getStartDate());
+			BookingDate reserved = bookingDatesRepository.getBooking(range.getStartDate());
 			if (reserved != null)
 				throw new UserServiceException(Constants.DATES_UNAVAILABLE,
 						Constants.DATES_UNAVAILABLE_STATUS);
@@ -79,8 +80,8 @@ public class BookingController {
 					Constants.DATES_INVALID_STATUS);
 		}
 
-		List<BookingDate> conflicts = bookingDatesRepository
-				.getBooking(range.getStartDate(), range.getEndDate());
+		List<BookingDate> conflicts = bookingDatesRepository.getBooking(range.getStartDate(),
+				range.getEndDate());
 		if (conflicts.size() > 0)
 			throw new UserServiceException(Constants.DATES_UNAVAILABLE,
 					Constants.DATES_UNAVAILABLE_STATUS);
@@ -93,20 +94,30 @@ public class BookingController {
 		return bookingRepository.save(booking);
 	}
 
-	@DeleteMapping(path = "/{userId}")
-	public void delete(@PathVariable("userId") String userId) {
-		bookingRepository.delete(userId);
+	@DeleteMapping(path = "/{bookingId}")
+	public void delete(@PathVariable("bookingId") String bookingId)
+			throws UserServiceException {
+
+		Booking booking = bookingRepository.findOne(bookingId);
+		if (bookingDatesServiceImpl.canWithdrawBooking(booking)) {
+			bookingRepository.delete(bookingId);
+
+			//TO DO: RETURN VALID RESPONSE
+			return;
+		}
+
+		throw new UserServiceException(Constants.GENERIC_ERROR_MESSAGE,
+				Constants.GENERIC_ERROR_MESSAGE_STATUS);
 	}
 
-	@PutMapping(path = "/{fullname}")
-	public Booking update(@PathVariable("fullname") String fullname,
-			@RequestBody Booking user) throws BadHttpRequest {
-		if (bookingRepository.exists(fullname)) {
-			user.setFullname(fullname);
-			return bookingRepository.save(user);
-		} else {
-			throw new BadHttpRequest();
+	@PutMapping(path = "/{bookingId}")
+	public void update(@PathVariable("bookingId") String bookingId,
+			@RequestBody Booking booking) throws BadHttpRequest {
+		Booking existingBooking = bookingRepository.findOne(bookingId);
+		if (existingBooking != null) {
+			existingBooking.setBookingDates(null);
+			existingBooking.setBookingDates(booking.getBookingDates());
+			BookingRepository.updateBooking(booking);
 		}
 	}
-
 }

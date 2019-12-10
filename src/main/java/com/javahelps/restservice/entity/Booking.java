@@ -7,11 +7,13 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -28,13 +30,17 @@ public class Booking implements Serializable {
 	@Column(name = "BOOKING_ID", unique = true, length = 255)
 	private String bookingId;
 
+	@Version
+	@Column(name = "VERSION")
+	private long version;
+	
 	@Column(name = "FULL_NAME", updatable = false, nullable = false)
 	private String fullname;
 
 	@Column(name = "EMAIL", updatable = false, nullable = false)
 	private String email;
 
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "USER_ID")
 	private Set<BookingDate> bookingDates;
 

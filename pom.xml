@@ -51,8 +51,8 @@
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>5.2.3.Final</version>
+			<artifactId>hibernate-core</artifactId>
+			<version>5.0.2.Final</version>
 		</dependency>
 
 		<!-- Data REST -->
@@ -104,6 +104,14 @@
 			<artifactId>google-java-format</artifactId>
 			<version>1.7</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.hsqldb/hsqldb -->
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.3.2</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<!-- Spring Boot Maven Plugin -->
@@ -112,6 +120,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.upgrade.app.Application</mainClass>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

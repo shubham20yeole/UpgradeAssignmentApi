@@ -55,8 +55,9 @@ public class BookingDateController {
 		List<BookingDate> bookedDates = bookingDateRepository.getBooking(startDate,
 				endDate);
 
-		return bookingServiceImpl.getAvailableDates(new HashSet<BookingDate>(bookedDates), startDate,
+		JSONArray result = bookingServiceImpl.getAvailableDates(new HashSet<BookingDate>(bookedDates), startDate,
 				endDate);
+		return result;
 	}
 
 	public JSONArray findAll() throws ParseException, java.text.ParseException {

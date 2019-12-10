@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Version;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
@@ -32,6 +33,10 @@ public class BookingDate
 	@Column(name = "BOOKING_DATE_ID", unique = true, length = 255)
 	private String bookingDateId;
 
+	@Version
+	@Column(name = "VERSION")
+	private long version;
+	
 	@Column(name = "BOOKING_DATE", unique = true, nullable = false)
 	private Date bookingDate;
 
@@ -65,6 +70,6 @@ public class BookingDate
 	}
 
 	@ManyToOne
-	private Booking user;
+	private Booking booking;
 
 }

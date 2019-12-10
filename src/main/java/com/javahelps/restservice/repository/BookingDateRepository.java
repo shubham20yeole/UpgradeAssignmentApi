@@ -18,6 +18,7 @@ public interface BookingDateRepository extends JpaRepository<BookingDate, String
 	public static final String FIND_ALL_BOOKINGS= "SELECT BOOKING_DATE FROM booking_date";
 	public static final String FIND_BOOKED_DATES = "SELECT r FROM BookingDate r WHERE r.bookingDate >= ?1 and r.bookingDate <= ?2";
 	public static final String FIND_VACANT_DATE = "SELECT r FROM BookingDate r WHERE r.bookingDate = ?1";
+	public static final String FIND_BOOKING_BY_ID = "SELECT r FROM BookingDate r WHERE r.booking = ?1";
 
 	@Query(value = FIND_ALL_BOOKINGS, nativeQuery = true)
 	public Set<BookingDate> findCampsiteVacancy();
@@ -27,5 +28,7 @@ public interface BookingDateRepository extends JpaRepository<BookingDate, String
 	
 	@Query(value = FIND_VACANT_DATE)
 	public BookingDate getBooking(Date startDate);
-
+	
+	@Query(value = FIND_BOOKING_BY_ID)
+	public BookingDate getBookingDateByBookingId(String bookingId);
 }
