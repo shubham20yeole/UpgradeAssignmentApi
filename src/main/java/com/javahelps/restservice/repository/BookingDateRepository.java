@@ -23,6 +23,7 @@ public interface BookingDateRepository extends JpaRepository<BookingDate, String
 	@Query(value = FIND_ALL_BOOKINGS, nativeQuery = true)
 	public Set<BookingDate> findCampsiteVacancy();
 
+//	SELECT * FROM booking_date WHERE booking_date >= 'Thu Dec 19 00:00:00 PST 2019' and booking_date <= 'Fri Jan 03 00:00:00 PST 2020'
 	@Query(value = FIND_BOOKED_DATES)
 	public List<BookingDate> getBooking(Date startDate, Date endDate);
 	

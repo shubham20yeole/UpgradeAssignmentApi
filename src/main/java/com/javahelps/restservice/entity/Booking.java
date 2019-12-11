@@ -14,8 +14,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 public class Booking implements Serializable {
@@ -34,9 +36,14 @@ public class Booking implements Serializable {
 	@Column(name = "VERSION")
 	private long version;
 	
+	
+	@NotNull(message = "FULL_NAME may not be null")
+	@NotEmpty(message = "FULL_NAME may not be empty")
 	@Column(name = "FULL_NAME", updatable = false, nullable = false)
 	private String fullname;
 
+	@NotNull(message = "EMAIL may not be null")
+	@NotEmpty(message = "EMAIL may not be empty")
 	@Column(name = "EMAIL", updatable = false, nullable = false)
 	private String email;
 

@@ -8,8 +8,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +35,7 @@ import com.javahelps.service.DateRange;
 import org.hibernate.Session;
 import javassist.tools.web.BadHttpRequest;
 
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
 @RequestMapping(path = "/booking")
 public class BookingController {
@@ -65,6 +69,10 @@ public class BookingController {
 		if (bookingDates.size() == 0)
 			throw new UserServiceException(Constants.DATES_NOT_FOUND,
 					Constants.DATES_NOT_FOUND_STATUS);
+		
+		if (bookingDates.size() > 3)
+			throw new UserServiceException(Constants.DATES_LONG_DURATION,
+					Constants.DATES_LONG_DURATION_STATUS);
 
 		DateRange range = dateUtils.getDateRange(bookingDates);
 
@@ -90,10 +98,17 @@ public class BookingController {
 			throw new UserServiceException(Constants.DATES_MAX_DURATION_EXCEED,
 					Constants.DATES_MAX_DURATION_EXCEED_STATUS);
 		}
-
-		return bookingRepository.save(booking);
+		
+		try {
+			bookingRepository.save(booking);
+		} catch(ConstraintViolationException ex) {
+			throw new UserServiceException(Constants.INVALID_NAME_OR_EMAIL,
+					Constants.INVALID_NAME_OR_EMAIL_STATUS);
+		}
+		return booking;
 	}
 
+	@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 	@DeleteMapping(path = "/{bookingId}")
 	public void delete(@PathVariable("bookingId") String bookingId)
 			throws UserServiceException {
@@ -101,15 +116,14 @@ public class BookingController {
 		Booking booking = bookingRepository.findOne(bookingId);
 		if (bookingDatesServiceImpl.canWithdrawBooking(booking)) {
 			bookingRepository.delete(bookingId);
-
-			//TO DO: RETURN VALID RESPONSE
 			return;
 		}
 
-		throw new UserServiceException(Constants.GENERIC_ERROR_MESSAGE,
-				Constants.GENERIC_ERROR_MESSAGE_STATUS);
+		throw new UserServiceException(Constants.RESERVATION_EXPIRED,
+				Constants.RESERVATION_EXPIRED_STATUS);
 	}
 
+	@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 	@PutMapping(path = "/{bookingId}")
 	public void update(@PathVariable("bookingId") String bookingId,
 			@RequestBody Booking booking) throws BadHttpRequest {

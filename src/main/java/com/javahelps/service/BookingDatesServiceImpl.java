@@ -27,8 +27,9 @@ public class BookingDatesServiceImpl extends DateUtilImpl
 		Date        today            = new Date();
 		Set<String> bookingRefactors = bookingDatesToStringSet(bookedDates);
 
+		if (!bookingRefactors.contains(formatDate(startDate))) vacancies.add(formatDate(startDate));
 		Date tempStartDate = startDate;
-		while (tempStartDate.compareTo(endDate) <= 0) {
+		while (tempStartDate.compareTo(endDate) < 0) {
 			String newDate = formatDate(addDays(1, tempStartDate));
 			bookingRefactors.contains(newDate);
 			tempStartDate = addDays(1, tempStartDate);
