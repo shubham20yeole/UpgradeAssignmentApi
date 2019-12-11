@@ -35,7 +35,7 @@ import com.javahelps.service.DateRange;
 import org.hibernate.Session;
 import javassist.tools.web.BadHttpRequest;
 
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
+@CrossOrigin(origins = "http://campsiteclient.herokuapp.com/", maxAge = 3600)
 @RestController
 @RequestMapping(path = "/booking")
 public class BookingController {
@@ -108,7 +108,7 @@ public class BookingController {
 		return booking;
 	}
 
-	@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
+	@CrossOrigin(origins = "http://campsiteclient.herokuapp.com/", maxAge = 3600)
 	@DeleteMapping(path = "/{bookingId}")
 	public void delete(@PathVariable("bookingId") String bookingId)
 			throws UserServiceException {
@@ -123,7 +123,7 @@ public class BookingController {
 				Constants.RESERVATION_EXPIRED_STATUS);
 	}
 
-	@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
+	@CrossOrigin(origins = "http://campsiteclient.herokuapp.com/", maxAge = 3600)
 	@PutMapping(path = "/{bookingId}")
 	public void update(@PathVariable("bookingId") String bookingId,
 			@RequestBody Booking booking) throws BadHttpRequest {

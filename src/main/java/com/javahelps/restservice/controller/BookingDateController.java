@@ -29,7 +29,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
+@CrossOrigin(origins = "http://campsiteclient.herokuapp.com", maxAge = 3600)
 @RestController
 @RequestMapping(path = "/booking/dates")
 public class BookingDateController {
@@ -44,7 +44,7 @@ public class BookingDateController {
 	 * should expose an API to provide information of the availability of the
 	 * campsite. for a given date range with the default being 1 month.
 	 */
-	@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
+	@CrossOrigin(origins = "http://campsiteclient.herokuapp.com", maxAge = 3600)
 	@GetMapping
 	public JSONArray checkAvaibility(@RequestParam(value = "from") Optional<String> from,
 			@RequestParam(value = "to") Optional<String> to) throws java.text.ParseException {
