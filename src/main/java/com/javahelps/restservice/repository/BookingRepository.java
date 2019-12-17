@@ -19,13 +19,13 @@ public interface BookingRepository
 	
 	
 	public static void updateBooking(Booking booking) {
-//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("upgradeassignment");
-//	  EntityManager entitymanager = emfactory.createEntityManager();
-//	  entitymanager.getTransaction().begin();
-//	  entitymanager.persist(booking);
-//	  entitymanager.getTransaction().commit();
-//	  entitymanager.close();
-//	  emfactory.close();
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("upgradeassignment");
+	  EntityManager entitymanager = emfactory.createEntityManager();
+	  entitymanager.getTransaction().begin();
+	  entitymanager.persist(booking);
+	  entitymanager.getTransaction().commit();
+	  entitymanager.close();
+	  emfactory.close();
 	}
 	
 }

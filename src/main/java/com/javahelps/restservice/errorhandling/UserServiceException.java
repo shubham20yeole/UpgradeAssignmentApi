@@ -1,4 +1,4 @@
-package com.javahelps.errorhandling;
+package com.javahelps.restservice.errorhandling;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

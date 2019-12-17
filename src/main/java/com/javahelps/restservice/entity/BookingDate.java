@@ -18,7 +18,7 @@ import javax.persistence.Version;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
-import com.javahelps.service.DateUtilImpl;
+import com.javahelps.restservice.service.DateUtilImpl;
 
 @Entity
 public class BookingDate

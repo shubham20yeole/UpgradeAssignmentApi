@@ -1,4 +1,4 @@
-package com.javahelps.service;
+package com.javahelps.restservice.service;
 
 import java.text.ParseException;
 
@@ -9,10 +9,10 @@ import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.javahelps.errorhandling.Constants;
-import com.javahelps.errorhandling.UserServiceException;
+import com.javahelps.restservice.bookingValidations.ValidationConstants;
 import com.javahelps.restservice.entity.Booking;
 import com.javahelps.restservice.entity.BookingDate;
+import com.javahelps.restservice.errorhandling.UserServiceException;
 import com.javahelps.restservice.repository.BookingDateRepository;
 import com.javahelps.restservice.repository.BookingRepository;
 
@@ -20,6 +20,7 @@ import com.javahelps.restservice.repository.BookingRepository;
 public class BookingDatesServiceImpl extends DateUtilImpl
 		implements BookingDatesService {
 
+	// Get left outer join of reserved and all dates
 	public JSONArray getAvailableDates(Set<BookingDate> bookedDates, Date startDate,
 			Date endDate) throws ParseException {
 
@@ -27,7 +28,8 @@ public class BookingDatesServiceImpl extends DateUtilImpl
 		Date        today            = new Date();
 		Set<String> bookingRefactors = bookingDatesToStringSet(bookedDates);
 
-		if (!bookingRefactors.contains(formatDate(startDate))) vacancies.add(formatDate(startDate));
+		if (!bookingRefactors.contains(formatDate(startDate)))
+			vacancies.add(formatDate(startDate));
 		Date tempStartDate = startDate;
 		while (tempStartDate.compareTo(endDate) < 0) {
 			String newDate = formatDate(addDays(1, tempStartDate));
@@ -40,6 +42,7 @@ public class BookingDatesServiceImpl extends DateUtilImpl
 		return vacancies;
 	}
 
+	// Check if dates are in past
 	public boolean hasExpiredBookingDates(Booking booking) throws UserServiceException {
 		Set<BookingDate> bookingDates = booking.getBookingDates();
 		for (BookingDate bookingDate : bookingDates)
@@ -50,16 +53,17 @@ public class BookingDatesServiceImpl extends DateUtilImpl
 
 	}
 
+	// Past bookings could not be withdrawn/canceled, check it in this method
 	public boolean canWithdrawBooking(Booking booking) throws UserServiceException {
 		if (booking == null)
-			throw new UserServiceException(Constants.RESERVATION_NOT_FOUND,
-					Constants.RESERVATION_NOT_FOUND_STATUS);
+			throw new UserServiceException(ValidationConstants.getReservationNotFound(),
+					ValidationConstants.getReservationNotFoundStatus());
 
 		if (hasExpiredBookingDates(booking))
-			throw new UserServiceException(Constants.RESERVATION_EXPIRED,
-					Constants.RESERVATION_EXPIRED_STATUS);
-		
+			throw new UserServiceException(ValidationConstants.getReservationExpired(),
+					ValidationConstants.getReservationExpiredStatus());
+
 		return true;
-		
+
 	}
 }

@@ -39,12 +39,12 @@ public class Booking implements Serializable {
 	
 	@NotNull(message = "FULL_NAME may not be null")
 	@NotEmpty(message = "FULL_NAME may not be empty")
-	@Column(name = "FULL_NAME", updatable = false, nullable = false)
+	@Column(name = "FULL_NAME")
 	private String fullname;
 
 	@NotNull(message = "EMAIL may not be null")
 	@NotEmpty(message = "EMAIL may not be empty")
-	@Column(name = "EMAIL", updatable = false, nullable = false)
+	@Column(name = "EMAIL")
 	private String email;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval=true, fetch = FetchType.LAZY)

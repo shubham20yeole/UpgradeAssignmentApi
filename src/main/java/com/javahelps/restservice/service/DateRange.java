@@ -1,4 +1,4 @@
-package com.javahelps.service;
+package com.javahelps.restservice.service;
 
 import java.util.Calendar;
 import java.util.Date;

@@ -1,17 +1,20 @@
 package com.javahelps.restservice.controller;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.AbstractMap;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.LockModeType;
+import javax.persistence.Persistence;
 import javax.validation.ConstraintViolationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,17 +25,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.javahelps.errorhandling.Constants;
-import com.javahelps.errorhandling.UserServiceException;
 import com.javahelps.restservice.entity.BookingDate;
+import com.javahelps.restservice.errorhandling.UserServiceException;
+import com.javahelps.restservice.bookingValidations.ValidationConstants;
+import com.javahelps.restservice.bookingValidations.Validations;
 import com.javahelps.restservice.entity.Booking;
 import com.javahelps.restservice.repository.BookingDateRepository;
 import com.javahelps.restservice.repository.BookingRepository;
-import com.javahelps.service.DateUtilImpl;
-import com.javahelps.service.BookingDatesServiceImpl;
-import com.javahelps.service.DateRange;
+import com.javahelps.restservice.service.BookingDatesServiceImpl;
+import com.javahelps.restservice.service.DateRange;
+import com.javahelps.restservice.service.DateUtilImpl;
 
-import org.hibernate.Session;
 import javassist.tools.web.BadHttpRequest;
 
 @CrossOrigin(origins = "http://campsiteclient.herokuapp.com/", maxAge = 3600)
@@ -63,47 +66,59 @@ public class BookingController {
 	public Booking create(@RequestBody Booking booking)
 			throws UserServiceException, ParseException {
 
-		Set<BookingDate>  bookingDates = booking.getBookingDates();
-		List<BookingDate> shs          = new ArrayList<BookingDate>(bookingDates);
+    EntityManagerFactory emfactory = Persistence.createEntityManagerFactory( "Eclipselink_JPA" );
+    EntityManager entityManager = emfactory.createEntityManager( );
 
-		if (bookingDates.size() == 0)
-			throw new UserServiceException(Constants.DATES_NOT_FOUND,
-					Constants.DATES_NOT_FOUND_STATUS);
-		
-		if (bookingDates.size() > 3)
-			throw new UserServiceException(Constants.DATES_LONG_DURATION,
-					Constants.DATES_LONG_DURATION_STATUS);
+		// Get new booking sets
+		Set<BookingDate> bookingDates = booking.getBookingDates();
 
+		/*
+		 * Initiate dates locking system
+		 * USE PESSIMISTIC LOCK IN JPA
+		 */
+		for (BookingDate bookingDate : bookingDates) {
+
+			// Lock the date
+			entityManager.lock(bookingDate, LockModeType.PESSIMISTIC_WRITE);
+			
+			// Define PESSIMISTIC LOCK properties
+			// Lock will timeout after 2 secs
+			Map<String, Object> properties = new HashMap<>(); 
+			properties.put("javax.persistence.lock.timeout", 2000); 
+			 
+			// Set PESSIMISTIC LOCK time out
+			entityManager.find(bookingDate.getClass(), bookingDate.getBookingDateId(), LockModeType.PESSIMISTIC_READ, properties);
+		}
+
+		// Get start and end dates range
 		DateRange range = dateUtils.getDateRange(bookingDates);
 
-		if (range.isSingleDayReservation()) {
-			BookingDate reserved = bookingDatesRepository.getBooking(range.getStartDate());
-			if (reserved != null)
-				throw new UserServiceException(Constants.DATES_UNAVAILABLE,
-						Constants.DATES_UNAVAILABLE_STATUS);
-		}
+		// Get already reserved dates if start and end date is not provided
+		BookingDate reserved = bookingDatesRepository.getBooking(range.getStartDate());
 
-		if (!range.hasValidStartDate()) {
-			throw new UserServiceException(Constants.DATES_INVALID,
-					Constants.DATES_INVALID_STATUS);
-		}
-
+		// Get conflict reservations on provided dates
 		List<BookingDate> conflicts = bookingDatesRepository.getBooking(range.getStartDate(),
 				range.getEndDate());
-		if (conflicts.size() > 0)
-			throw new UserServiceException(Constants.DATES_UNAVAILABLE,
-					Constants.DATES_UNAVAILABLE_STATUS);
 
-		if (!range.isThreeDaysReservation()) {
-			throw new UserServiceException(Constants.DATES_MAX_DURATION_EXCEED,
-					Constants.DATES_MAX_DURATION_EXCEED_STATUS);
+		// Send above data to Validations object to validate if reservation can be made
+		Validations constantsImpl = new Validations(bookingDates, range, conflicts,
+				reserved);
+
+		// Check if valid dates are provided
+		if (!constantsImpl.isValid()) {
+			AbstractMap.Entry<String, Integer> validation = constantsImpl.getValidation();
+
+			// Throw exception if invalid dates are provided
+			throw new UserServiceException(validation.getKey(), validation.getValue());
 		}
-		
+
 		try {
+			// If we are here means user provided valid dates
+			// Post reservation
 			bookingRepository.save(booking);
-		} catch(ConstraintViolationException ex) {
-			throw new UserServiceException(Constants.INVALID_NAME_OR_EMAIL,
-					Constants.INVALID_NAME_OR_EMAIL_STATUS);
+		} catch (ConstraintViolationException ex) {
+			throw new UserServiceException(ValidationConstants.getInvalidNameOrEmail(),
+					ValidationConstants.getInvalidNameOrEmailStatus());
 		}
 		return booking;
 	}
@@ -119,8 +134,8 @@ public class BookingController {
 			return;
 		}
 
-		throw new UserServiceException(Constants.RESERVATION_EXPIRED,
-				Constants.RESERVATION_EXPIRED_STATUS);
+		throw new UserServiceException(ValidationConstants.getReservationExpired(),
+				ValidationConstants.getReservationExpiredStatus());
 	}
 
 	@CrossOrigin(origins = "http://campsiteclient.herokuapp.com/", maxAge = 3600)

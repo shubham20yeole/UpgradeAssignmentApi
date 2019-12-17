@@ -1,4 +1,4 @@
-package com.javahelps.service;
+package com.javahelps.restservice.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,18 +13,22 @@ import java.util.TimeZone;
 
 import org.json.simple.JSONArray;
 
-import com.javahelps.errorhandling.Constants;
+import com.javahelps.restservice.bookingValidations.ValidationConstants;
 import com.javahelps.restservice.entity.BookingDate;
 
 public class DateUtilImpl implements DateUtil {
+
+	// Date to String format
 	public String formatDate(Date date) {
-		return new SimpleDateFormat(Constants.ALLOWED_DATE_FORMAT).format(date);
+		return new SimpleDateFormat(ValidationConstants.getAllowedDateFormat()).format(date);
 	}
 
+	// String to Date format
 	public Date formatDate(String date) throws ParseException {
-		return new SimpleDateFormat(Constants.ALLOWED_DATE_FORMAT).parse(date);
+		return new SimpleDateFormat(ValidationConstants.getAllowedDateFormat()).parse(date);
 	}
 
+	// Date to Calendar format and set defaulkt time to midnight
 	public Calendar dateToCalendar(Date date) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
@@ -35,12 +39,15 @@ public class DateUtilImpl implements DateUtil {
 		return c;
 	}
 
+	// Function to add days
 	public Date addDays(int days, Date toDate) throws ParseException {
 		Calendar c = dateToCalendar(toDate);
 		c.add(Calendar.DAY_OF_MONTH, days);
 		return c.getTime();
 	}
 
+	// Prepocess the bookingDates as set.contains cannot find duplicates because of
+	// object equality rule
 	public Set<String> bookingDatesToStringSet(Set<BookingDate> bookingDates) {
 		Set<String> bookingDatesInStringFormat = new HashSet<>();
 		for (BookingDate bookingDate : bookingDates) {
@@ -49,6 +56,7 @@ public class DateUtilImpl implements DateUtil {
 		return bookingDatesInStringFormat;
 	}
 
+	// Get range between two dates
 	public DateRange getDateRange(Set<BookingDate> reservations) {
 		List<BookingDate> list = new ArrayList<BookingDate>(reservations);
 		Collections.sort(list);
@@ -56,17 +64,21 @@ public class DateUtilImpl implements DateUtil {
 				list.get(list.size() - 1).getBookingDate());
 	}
 
+	// Calculate difference in days between two dates
 	public int dateDifference(Date endDate, Date startDate) {
-		Calendar endDateCalendar  = dateToCalendar(endDate);
-		Calendar startDateCalendar = dateToCalendar	(startDate);
+		Calendar endDateCalendar   = dateToCalendar(endDate);
+		Calendar startDateCalendar = dateToCalendar(startDate);
 		return Math.round(
-				(float) (endDateCalendar.getTimeInMillis() - startDateCalendar.getTimeInMillis()) / (24 * 60 * 60 * 1000));
+				(float) (endDateCalendar.getTimeInMillis() - startDateCalendar.getTimeInMillis())
+						/ (24 * 60 * 60 * 1000));
 	}
 
+	// Check if start date is valid, start date should be one day ahead of today and
+	// within one month in future
 	public boolean hasValidStartDate(Date startDate, Date endDate) {
 		int startDateFromNow = dateDifference(startDate, new Date());
 		int endDateFromNow   = dateDifference(endDate, new Date());
-		int numOfBookings = dateDifference(endDate, startDate);
+		int numOfBookings    = dateDifference(endDate, startDate);
 		return startDateFromNow >= 1 && endDateFromNow <= 30 && numOfBookings <= 3;
 	}
 }

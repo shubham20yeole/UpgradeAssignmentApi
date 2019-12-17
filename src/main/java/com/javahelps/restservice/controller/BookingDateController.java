@@ -13,9 +13,9 @@ import com.google.gson.Gson;
 import com.javahelps.restservice.entity.Booking;
 import com.javahelps.restservice.entity.BookingDate;
 import com.javahelps.restservice.repository.BookingDateRepository;
-import com.javahelps.service.BookingDatesServiceImpl;
-import com.javahelps.service.DateRange;
-import com.javahelps.service.DateUtilImpl;
+import com.javahelps.restservice.service.BookingDatesServiceImpl;
+import com.javahelps.restservice.service.DateRange;
+import com.javahelps.restservice.service.DateUtilImpl;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,8 +35,8 @@ import org.json.simple.parser.ParseException;
 public class BookingDateController {
 
 	@Autowired
-	private BookingDateRepository     bookingDateRepository;
-	private DateUtilImpl dateUtils = new DateUtilImpl();
+	private BookingDateRepository   bookingDateRepository;
+	private DateUtilImpl            dateUtils          = new DateUtilImpl();
 	private BookingDatesServiceImpl bookingServiceImpl = new BookingDatesServiceImpl();
 
 	/*
@@ -49,32 +49,31 @@ public class BookingDateController {
 	public JSONArray checkAvaibility(@RequestParam(value = "from") Optional<String> from,
 			@RequestParam(value = "to") Optional<String> to) throws java.text.ParseException {
 
-		String startDateStringFormat = from.orElse(dateUtils.formatDate(dateUtils.addDays(1, new Date())));
+		String startDateStringFormat = from
+				.orElse(dateUtils.formatDate(dateUtils.addDays(1, new Date())));
 		String endDateStringFormat   = to
 				.orElse(dateUtils.formatDate(dateUtils.addDays(31, new Date())));
 
 		Date startDate = bookingServiceImpl.formatDate(startDateStringFormat);
 		Date endDate   = dateUtils.formatDate(endDateStringFormat);
 
-		List<BookingDate> bookedDates = bookingDateRepository.getBooking(startDate,
-				endDate);
-//		Thu Dec 19 00:00:00 PST 2019 Fri Jan 03 00:00:00 PST 2020
-		
-		List<String> list = new ArrayList<String>();
-		
-		for(BookingDate bookingDate: bookedDates) {
-			Date dd = bookingDate.getBookingDate();
-			String ddd = dateUtils.formatDate(dd);
-			list.add(ddd);
-		}
-		
+		List<BookingDate> bookedDates = bookingDateRepository.getBooking(startDate, endDate);
 
-		JSONArray result = bookingServiceImpl.getAvailableDates(new HashSet<BookingDate>(bookedDates), startDate,
-				endDate);
+		List<String> list = new ArrayList<String>();
+
+		for (BookingDate bookingDate : bookedDates) {
+			Date   date  = bookingDate.getBookingDate();
+			String dateToString = dateUtils.formatDate(date);
+			list.add(dateToString);
+		}
+
+		JSONArray result = bookingServiceImpl
+				.getAvailableDates(new HashSet<BookingDate>(bookedDates), startDate, endDate);
 		return result;
 	}
 
-	public JSONArray findAll() throws ParseException, java.text.ParseException {
+	// PRIVATE METHOD TO GET ALL RESERVED DATES FOR THIS CLASS ACCESS ONLY
+	private JSONArray findAll() throws ParseException, java.text.ParseException {
 		return (JSONArray) new JSONParser()
 				.parse(new Gson().toJson(bookingDateRepository.findCampsiteVacancy()));
 	}
